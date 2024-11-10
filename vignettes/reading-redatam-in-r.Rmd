@@ -1,0 +1,125 @@
+---
+title: "Reading REDATAM files in R"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{reading-redatam-in-r}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+We start by downloading the Chilean Census 2017 from GitHub:
+
+```{r download, eval = FALSE}
+library(redatam)
+
+download_microdata()
+```
+
+```
+[1] "/tmp/RtmpLdDUa5/CHILE2017.rds"
+```
+
+One of the many possibilities with this census is to obtain the number of houses
+with overcrowding. For this, the Secretary for Social Development and Family
+(Ministerio de Desarrollo Social y Familia) divides the number of people
+residing in a dwelling and the number of bedrooms in the dwelling, with the
+special case of adding one to studio apartments and similar units, and the
+result is discretized as follows.
+
+* No overcrowding $[0,2.5)$
+* Mean $[2.5,3.5)$
+* High $[3.5,4.9)$
+* Critical $[5,Inf)$
+
+According to the census documentation in the previous ZIP file, this consists in
+dividing the variables `cant_pers` and `p04` from the `vivienda` (housing) table
+to then discretize the result. The documentation also states that we must join
+the `vivienda` table with `zonaloc` (zones), `area`, `distrito` (district) and
+`communa` (municipality) to match each house with its corresponding
+municipality. This can be done with `dplyr`:
+
+```{r, eval = FALSE}
+library(dplyr)
+
+chile2017 <- readRDS("/tmp/RtmpLdDUa5/CHILE2017.rds")
+
+overcrowding <- chile2017$comuna %>%
+  select(ncomuna, comuna_ref_id) %>%
+  inner_join(
+    chile2017$distrito %>%
+    select(distrito_ref_id, comuna_ref_id)
+  ) %>%
+  inner_join(
+    chile2017$area %>%
+      select(area_ref_id, distrito_ref_id)
+  ) %>%
+  inner_join(
+    chile2017$zonaloc %>%
+      select(zonaloc_ref_id, area_ref_id)
+  ) %>%
+  inner_join(
+    chile2017$vivienda %>%
+      select(zonaloc_ref_id, vivienda_ref_id, cant_per, p04) %>%
+      mutate(
+        p04 = case_when(
+          p04 == 98 ~ NA_integer_,
+          p04 == 99 ~ NA_integer_,
+          TRUE ~ p04
+        )
+      ) %>%
+      filter(!is.na(p04))
+  ) %>%  
+  mutate(
+    overcrowding = case_when(
+      p04 >=1 ~ cant_per / p04,
+      p04 ==0 ~ cant_per / (p04 + 1)
+    )
+  ) %>% 
+  mutate(
+    overcrowding_discrete = case_when(
+      overcrowding  < 2.5                      ~ "No Overcrowding",
+      overcrowding >= 2.5 & overcrowding < 3.5 ~ "Mean",
+      overcrowding >= 3.5 & overcrowding < 5   ~ "High",
+      overcrowding >= 5                        ~ "Critical"
+    )
+  ) %>%
+  group_by(comuna = ncomuna, overcrowding_discrete) %>%
+  count()
+```
+
+Now we can filter for any municipality of our interest, for example:
+
+```{r metropolitana, eval = FALSE}
+overcrowding %>%
+  filter(comuna == "VITACURA")
+
+overcrowding %>%
+  filter(comuna == "LA PINTANA")
+```
+
+```
+# A tibble: 4 × 3
+# Groups:   comuna, overcrowding_discrete [4]
+  comuna   overcrowding_discrete     n
+  <fct>    <chr>                 <int>
+1 VITACURA Critical                  9
+2 VITACURA High                     18
+3 VITACURA Mean                    174
+4 VITACURA No Overcrowding       26752
+
+# A tibble: 4 × 3
+# Groups:   comuna, overcrowding_discrete [4]
+  comuna     overcrowding_discrete     n
+  <fct>      <chr>                 <int>
+1 LA PINTANA Critical                497
+2 LA PINTANA High                   1112
+3 LA PINTANA Mean                   4522
+4 LA PINTANA No Overcrowding       39163
+```

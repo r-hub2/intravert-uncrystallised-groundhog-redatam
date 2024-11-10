@@ -1,0 +1,11 @@
+7cb26da9590ba98875ac835feb73f769 *DESCRIPTION
+a72c27b379aa4b31335294a0a124a293 *NAMESPACE
+7493988a5c4d19fc6908423e82a9da1b *NEWS.md
+db29695d586b61fad527c8f013d34d52 *R/download_microdata.R
+d04ab8266dd3930c6cffda387e511af0 *build/vignette.rds
+204d0493c8a36ffdfa093f4141716b73 *inst/doc/reading-redatam-in-r.R
+ef6d2708460bea41d510c4edadc77ccf *inst/doc/reading-redatam-in-r.Rmd
+deb12a4bc138b23c35d204bc69e4b912 *inst/doc/reading-redatam-in-r.html
+d81c482dff7e0349c6913a00b1ec6b1b *man/download_microdata.Rd
+3e9cf68cc2f42fa7085002b2079b7680 *man/figures/logo.svg
+ef6d2708460bea41d510c4edadc77ccf *vignettes/reading-redatam-in-r.Rmd
