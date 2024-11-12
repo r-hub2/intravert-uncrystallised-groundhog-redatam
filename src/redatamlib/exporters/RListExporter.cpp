@@ -1,30 +1,29 @@
 #include "RListExporter.hpp"
 
 #include <algorithm>  // For std::replace
-#include <cpp11.hpp>
 #include <sstream>
 
 #include "Entity.hpp"
 #include "ParentIDCalculator.hpp"
 
 namespace RedatamLib {
-using std::ostringstream;
 using std::endl;
+using std::ostringstream;
 
 // just to mimic the original CSVExporter
-ListExporter::ListExporter(const std::string& outputDirectory)
+ListExporter::ListExporter(const std::string &outputDirectory)
     : m_path(outputDirectory) {
-  if ('/' != m_path.back()) {
+  if (!m_path.empty() && '/' != m_path.back()) {
     m_path.append("/");
   }
 }
 
 cpp11::list ListExporter::ExportAllR(
-    const std::vector<Entity>& entities) const {
+    const std::vector<Entity> &entities) const {
   cpp11::writable::list result;
   cpp11::writable::strings resultNames;
 
-  for (const Entity& entity : entities) {
+  for (const Entity &entity : entities) {
     std::string entityName = entity.GetName();
     std::transform(entityName.begin(), entityName.end(), entityName.begin(),
                    ::tolower);
@@ -39,7 +38,7 @@ cpp11::list ListExporter::ExportAllR(
     size_t numRows = entity.GetRowsCount();
     cpp11::writable::integers ref_id_vec(numRows);
     cpp11::writable::integers parent_ref_id_vec(numRows);
-    ParentIDCalculator pIDCalc(const_cast<Entity*>(&entity));
+    ParentIDCalculator pIDCalc(const_cast<Entity *>(&entity));
 
     std::string ref_id_name = entity.GetName() + "_REF_ID";
     std::string parent_ref_id_name = entity.GetParentName() + "_REF_ID";
@@ -60,7 +59,7 @@ cpp11::list ListExporter::ExportAllR(
     }
 
     // Add vectors for each variable
-    for (const Variable& v : *(entity.GetVariables().get())) {
+    for (const Variable &v : *(entity.GetVariables().get())) {
       try {
         switch (v.GetType()) {
           case BIN:
@@ -68,7 +67,7 @@ cpp11::list ListExporter::ExportAllR(
           case INT:
           case LNG: {
             auto values =
-                static_cast<std::vector<uint32_t>*>(v.GetValues().get());
+                static_cast<std::vector<uint32_t> *>(v.GetValues().get());
             cpp11::writable::integers rvalues(numRows);
             for (size_t i = 0; i < numRows; i++) {
               rvalues[i] = values->at(i);
@@ -78,7 +77,7 @@ cpp11::list ListExporter::ExportAllR(
           }
           case CHR: {
             auto values =
-                static_cast<std::vector<std::string>*>(v.GetValues().get());
+                static_cast<std::vector<std::string> *>(v.GetValues().get());
             cpp11::writable::strings rvalues(numRows);
             for (size_t i = 0; i < numRows; i++) {
               // replace '\0' with ' '
@@ -91,7 +90,7 @@ cpp11::list ListExporter::ExportAllR(
           }
           case DBL: {
             auto values =
-                static_cast<std::vector<double>*>(v.GetValues().get());
+                static_cast<std::vector<double> *>(v.GetValues().get());
             cpp11::writable::doubles rvalues(numRows);
             for (size_t i = 0; i < numRows; i++) {
               rvalues[i] = values->at(i);
@@ -105,7 +104,7 @@ cpp11::list ListExporter::ExportAllR(
             cpp11::message(unknownTypeMsg.c_str());
             break;
         }
-      } catch (const std::exception& e) {
+      } catch (const std::exception &e) {
         std::string errorExportingVariableMsg =
             "Error exporting variable: " + v.GetName() + " - " + e.what();
         cpp11::message(errorExportingVariableMsg.c_str());
@@ -127,16 +126,16 @@ cpp11::list ListExporter::ExportAllR(
   return result;
 }
 
-void ListExporter::AddVariableLabels(const Variable& v,
-                                     cpp11::writable::list& result,
-                                     cpp11::writable::strings& resultNames,
-                                     const std::string& entityName) {
+void ListExporter::AddVariableLabels(const Variable &v,
+                                     cpp11::writable::list &result,
+                                     cpp11::writable::strings &resultNames,
+                                     const std::string &entityName) {
   if (!v.GetTags().empty()) {
     cpp11::writable::list labelTable;
     cpp11::writable::strings variableColumn;
     cpp11::writable::strings meaningColumn;
 
-    for (const Tag& t : v.GetTags()) {
+    for (const Tag &t : v.GetTags()) {
       std::string clean_key = t.first;
       std::string clean_value = t.second;
       std::replace(clean_key.begin(), clean_key.end(), '\0', ' ');

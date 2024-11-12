@@ -6,16 +6,16 @@
 namespace RedatamLib {
 class ParentIDCalculator {
  public:
-  explicit ParentIDCalculator(Entity* child);
+  explicit ParentIDCalculator(Entity *child);
   ~ParentIDCalculator() = default;
 
-  ParentIDCalculator(const ParentIDCalculator&) = delete;
-  ParentIDCalculator& operator=(const ParentIDCalculator&) = delete;
+  ParentIDCalculator(const ParentIDCalculator &) = delete;
+  ParentIDCalculator &operator=(const ParentIDCalculator &) = delete;
 
   size_t GetParentID(size_t currRow);
 
  private:
-  Entity* m_child;
+  Entity *m_child;
   size_t m_currID;
   size_t m_currLimit;
 };

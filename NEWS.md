@@ -1,3 +1,13 @@
+# redatam 2.0.3
+
+* Fixes memory management issues suggested by Ivan Krylov regarding the C++ to R
+  list casting.
+* Uses 2 threads during R CMD check
+
+# redatam 2.0.1
+
+* Fixes memory leaks warned by CRAN on clang-ASAN and gcc-UBSAN.
+
 # redatam 2.0.0
 
 * First CRAN release.

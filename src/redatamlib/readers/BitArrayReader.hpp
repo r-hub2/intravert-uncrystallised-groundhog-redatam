@@ -14,10 +14,10 @@ class BitArrayReader {
   BitArrayReader(size_t dataSize);
   ~BitArrayReader() = default;
 
-  BitArrayReader(const BitArrayReader&) = delete;
-  BitArrayReader& operator=(const BitArrayReader&) = delete;
+  BitArrayReader(const BitArrayReader &) = delete;
+  BitArrayReader &operator=(const BitArrayReader &) = delete;
 
-  void ParseBits(vector<uint32_t>* results, uint32_t data);
+  void ParseBits(vector<uint32_t> *results, uint32_t data);
 
  private:
   size_t m_varSize;

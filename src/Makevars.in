@@ -1,5 +1,7 @@
-PKG_CPPFLAGS=-Ivendor -Iredatamlib -Iredatamlib/entities -Iredatamlib/exporters -Iredatamlib/readers
-PKG_LIBS=-Lvendor -Lredatamlib
+PKG_CPPFLAGS=@cflags@
+PKG_LIBS=@libs@
+# CXXFLAGS=@cxxflags@
+LDFLAGS=@ldflags@
 
 # Explicitly list all source files
 SOURCES = vendor/pugixml.cpp \

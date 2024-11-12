@@ -13,8 +13,8 @@ Entity::Entity()
       m_reader(),
       m_rowsCount(0) {}
 
-Entity::Entity(const string& name, const string& parentName,
-               const string& description, const string& idxFileName,
+Entity::Entity(const string &name, const string &parentName,
+               const string &description, const string &idxFileName,
                pair<size_t, size_t> bounds)
     : m_name(name),
       m_parentName(parentName),
@@ -25,15 +25,15 @@ Entity::Entity(const string& name, const string& parentName,
       m_bounds(bounds),
       m_reader(idxFileName),
       m_rowsCount(0) {
-  //  PTR files shouldn't be empty, but in the odd case it is - treat it as
-  //  holding zeros
+  // PTR files shouldn't be empty, but in the odd case it is - treat it as
+  // holding zeros
   if (m_reader.GetEndPos() == m_reader.GetPos()) {
     m_rowsCount = 0;
   } else {
     m_reader.SetPos(m_reader.GetEndPos() - 4);
     m_rowsCount = m_reader.ReadInt32LE();
 
-    m_reader.SetPos(4);  //  advance past header of zeros
+    m_reader.SetPos(4);  // advance past header of zeros
   }
 }
 
@@ -53,9 +53,9 @@ pair<size_t, size_t> Entity::GetBounds() const { return m_bounds; }
 
 size_t Entity::GetPTRData() { return m_reader.ReadInt32LE(); }
 
-Entity* Entity::GetChild() const { return m_child; }
+Entity *Entity::GetChild() const { return m_child; }
 
-void Entity::AttachChild(Entity* child) { m_child = child; }
+void Entity::AttachChild(Entity *child) { m_child = child; }
 
 void Entity::AttachVariables(shared_ptr<vector<Variable>> variables) {
   m_variables = variables;

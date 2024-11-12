@@ -1,28 +1,28 @@
 #ifndef REDATAMLIB_VARIABLE_HPP
 #define REDATAMLIB_VARIABLE_HPP
 
-#include <memory>  //  std::shared_ptr
+#include <memory>  // std::shared_ptr
 #include <string>
-#include <utility>  //  std::pair
+#include <utility>  // std::pair
 #include <vector>
 
-#include "ByteArrayReader.hpp"
-
 namespace RedatamLib {
-using std::vector;
-using std::string;
 using std::pair;
 using std::shared_ptr;
+using std::string;
+using std::vector;
 
 enum VarType { BIN, CHR, DBL, INT, LNG, PCK, NA };
-using Tag = pair<string, string>;  //  Tag = <Key, Value>
+using Tag = pair<string, string>;  // Tag = <Key, Value>
+
+class ByteArrayReader;  // Forward declaration
 
 class Variable {
  public:
   explicit Variable();
-  explicit Variable(const string& name, VarType type, const string& idxFileName,
-                    size_t dataSize, const string& filter, const string& range,
-                    vector<Tag> tags, const string& description,
+  explicit Variable(const string &name, VarType type, const string &idxFileName,
+                    size_t dataSize, const string &filter, const string &range,
+                    vector<Tag> tags, const string &description,
                     size_t decimals = 0);
   ~Variable() = default;
 

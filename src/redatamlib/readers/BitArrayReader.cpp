@@ -1,8 +1,5 @@
 #include "BitArrayReader.hpp"
 
-#include <bitset>
-#include <vector>
-
 namespace RedatamLib {
 BitArrayReader::BitArrayReader(size_t dataSize)
     : m_varSize(dataSize),
@@ -21,7 +18,7 @@ std::bitset<32> BitArrayReader::CreateMask(size_t size) {
   return mask;
 }
 
-void BitArrayReader::ParseBits(std::vector<uint32_t>* results, uint32_t data) {
+void BitArrayReader::ParseBits(std::vector<uint32_t> *results, uint32_t data) {
   std::bitset<32> remainderMask = CreateMask(m_remainderSize);
   std::bitset<32> bits = data;
   m_data = m_remainder |
